@@ -20,10 +20,10 @@ wss.on("connection", (ws) => {
                 console.log("In if Socket")
                 socket = new WebSocket('ws://smartapisocket.angelone.in/smart-stream', {
                     headers: {
-                        'Authorization': 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlAzMzQ0NjAiLCJyb2xlcyI6MCwidXNlcnR5cGUiOiJVU0VSIiwiaWF0IjoxNjg5MzE5MzQ5LCJleHAiOjE2ODk0MDU3NDl9.iWqXPMsN1bLN99MJfDTluVQ33lRpJFO1s9S1PSCqvRE-ct9qwqdzII3hu-RrvpcLZoyF3cXbwHa2GCf1Fs_pow',
-                        'x-api-key': 'AGRYNg5p',
-                        'x-client-code': 'P334460',
-                        'x-feed-token': 'eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IlAzMzQ0NjAiLCJpYXQiOjE2ODkzMTkzNDksImV4cCI6MTY4OTQwNTc0OX0.lz3xI_46LXb7WNW-6C5w-fD-C88BH6bgdI6OQmajmN1rT9P3n0pVcZPeEf2kzhyOXquKsNBldhwelCEQwDcW-g',
+                        'Authorization': '',
+                        'x-api-key': '',
+                        'x-client-code': '',
+                        'x-feed-token': '',
                     },
                 });
             }
