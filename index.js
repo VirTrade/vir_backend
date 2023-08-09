@@ -1,22 +1,23 @@
 const express = require('express');
 const app = express();
-const server = require('http').createServer(app);
-const ws = require('ws')
-const socketIO = require("socket.io")(server, {
-    cors: {
-      origin: "http://localhost:8080",
-      methods: ["GET", "POST"]
-    }
-  });
-const cors = require('cors')
-
-
 app.use(cors());
 app.use((_req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "*");
     next();
   });
+const server = require('http').createServer(app);
+const ws = require('ws')
+const socketIO = require("socket.io")(server, {
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET", "POST"]
+    }
+  });
+const cors = require('cors')
+
+
+
 let sock;
 
 // const wss = new ws.Server({ server: server })
