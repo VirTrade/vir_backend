@@ -16,29 +16,26 @@ wss.on("connection", (ws) => {
         console.log("receivedData", receivedData);
         // Create a WebSocket instance with the desired URL and headers
         try {        
-            if(!socket) {
-                console.log("In if Socket")
-                socket = new WebSocket('ws://smartapisocket.angelone.in/smart-stream', {
-                    headers: {
-                        'Authorization': '',
-                        'x-api-key': '',
-                        'x-client-code': '',
-                        'x-feed-token': '',
-                    },
-                });
-            }
+            socket = new WebSocket('ws://smartapisocket.angelone.in/smart-stream', {
+                headers: {
+                    'Authorization': process.env.jwt,
+                    'x-api-key': process.env.api-key,
+                    'x-client-code': process.env.client-code,
+                    'x-feed-token': process.env.feed-token,
+                },
+            }); 
 
             socket.on('open', () => {
                 console.log('WebSocket connection established');
 
                 // Send a subscribe request for LTP mode with the desired token
                 let json_req = {                    
-                    action: 1,
+                    action: 0,
                     params: {
                         mode: 1,
                         tokenList: [
                             {
-                                exchangeType: 1,
+                                exchangeType: 5,
                                 tokens: receivedData,
                             },
                         ],
