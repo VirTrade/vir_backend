@@ -23,14 +23,15 @@ let sock;
 // const io = socketIO(server);
 
 socketIO.on("connection", (socket) => {
-  console.log("Socket connected");
-  const userId = generateUniqueId(); // Replace with your method to generate a unique ID
+//   console.log("Socket connected");
+  let counter = 0; // Replace with your method to generate a unique ID
+  let userId = counter + 1;
   console.log(`User ${userId} connected`);
 
   // Emit the user ID to the client
   socket.emit('userId', userId);
   socket.on("sendData", (data) => {
-    console.log("Received data from frontend:", data);    
+    // console.log("Received data from frontend:", data);    
     const headers = socket.handshake.headers
 
     // Create a WebSocket instance with the desired URL and headers
@@ -45,7 +46,7 @@ socketIO.on("connection", (socket) => {
       });
 
       sock.on("open", () => {
-        console.log("WebSocket connection established");
+        // console.log("WebSocket connection established");
 
         // Send a subscribe request for LTP mode with the desired token
         let json_req = {
@@ -73,7 +74,7 @@ socketIO.on("connection", (socket) => {
 
       // Event listener for connection close
       sock.on("close", (code, reason) => {
-        console.log("WebSocket connection closed:", code, reason);
+        console.log("WebSocket connection closed:", code, reason);        
       });
 
       // Event listener for connection errors
@@ -85,7 +86,7 @@ socketIO.on("connection", (socket) => {
         socket.send("ping");
       }, 30000);
     } catch (e) {
-      console.log(e);
+    //   console.log(e);
     }
   });
   socket.on("disconnect", () => {
