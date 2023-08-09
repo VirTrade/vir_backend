@@ -24,6 +24,11 @@ let sock;
 
 socketIO.on("connection", (socket) => {
   console.log("Socket connected");
+  const userId = generateUniqueId(); // Replace with your method to generate a unique ID
+  console.log(`User ${userId} connected`);
+
+  // Emit the user ID to the client
+  socket.emit('userId', userId);
   socket.on("sendData", (data) => {
     console.log("Received data from frontend:", data);    
     const headers = socket.handshake.headers
@@ -84,7 +89,7 @@ socketIO.on("connection", (socket) => {
     }
   });
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    console.log(`User ${userId} disconnected`);
   });
 });
 
