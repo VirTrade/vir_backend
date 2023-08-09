@@ -7,6 +7,11 @@ const cors = require('cors')
 
 
 app.use(cors());
+app.use((_req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "*");
+    next();
+  });
 let sock;
 
 const wss = new ws.Server({ server: server })
