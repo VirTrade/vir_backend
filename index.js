@@ -21,12 +21,15 @@ let sock;
 
 // const wss = new ws.Server({ server: server })
 // const io = socketIO(server);
-
+let socketSet = new Set();
+let userSet = new Set();
 socketIO.on("connection", (socket) => {
-//   console.log("Socket connected");
+  console.log("Socket connected with userSet", userSet);
   let counter = 0; // Replace with your method to generate a unique ID
   let userId = counter + 1;
+  userSet.add(userId);
   console.log(`User ${userId} connected`);
+  socketSet.add(socket);
 
   // Emit the user ID to the client
   socket.emit('userId', userId);
@@ -91,6 +94,8 @@ socketIO.on("connection", (socket) => {
   });
   socket.on("disconnect", () => {
     console.log(`User ${userId} disconnected`);
+    socketSet.delete(socket);
+    userSet.delete(userId);
   });
 });
 
