@@ -3,7 +3,7 @@ const app = express();
 const server = require('http').createServer(app);
 const ws = require('ws')
 const socketIO = require('socket.io');
-let socket;
+let sock;
 
 const wss = new ws.Server({ server: server })
 const io = socketIO(server);
@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
             console.log("receivedData", receivedData);
             // Create a WebSocket instance with the desired URL and headers
             try {        
-                socket = new WebSocket('ws://smartapisocket.angelone.in/smart-stream', {
+                sock = new WebSocket('ws://smartapisocket.angelone.in/smart-stream', {
                     headers: {
                         'Authorization': process.env.JWT_TOKEN,
                         'x-api-key': process.env.API_KEY,
@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
                     },
                 }); 
     
-                socket.on('open', () => {
+                sock.on('open', () => {
                     console.log('WebSocket connection established');
     
                     // Send a subscribe request for LTP mode with the desired token
@@ -49,23 +49,23 @@ io.on('connection', (socket) => {
                             ],
                         },
                     };
-                    socket.send(JSON.stringify(json_req));
+                    sock.send(JSON.stringify(json_req));
                 });
     
                 // Event listener for receiving messages            
     
-                socket.on('message', (data) => {
+                sock.on('message', (data) => {
                     console.log('Received message:', data);
                     ws.send(data)
                 });
     
                 // Event listener for connection close
-                socket.on('close', (code, reason) => {
+                sock.on('close', (code, reason) => {
                     console.log('WebSocket connection closed:', code, reason);
                 });
     
                 // Event listener for connection errors
-                socket.on('error', (error) => {
+                sock.on('error', (error) => {
                     console.error('WebSocket connection error:', error);
                 });
     
