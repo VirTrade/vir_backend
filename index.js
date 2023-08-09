@@ -25,8 +25,7 @@ let sock;
 socketIO.on("connection", (socket) => {
   console.log("Socket connected");
   socket.on("sendData", (data) => {
-    console.log("Received data from frontend:", data);
-    console.log(socket.handshake.headers)
+    console.log("Received data from frontend:", data);    
     const headers = socket.handshake.headers
 
     // Create a WebSocket instance with the desired URL and headers
@@ -45,13 +44,13 @@ socketIO.on("connection", (socket) => {
 
         // Send a subscribe request for LTP mode with the desired token
         let json_req = {
-          action: 0,
+          action: 1,
           params: {
             mode: 1,
             tokenList: [
               {
                 exchangeType: 5,
-                tokens: data,
+                tokens: JSON.parse(data),
               },
             ],
           },
@@ -62,8 +61,9 @@ socketIO.on("connection", (socket) => {
       // Event listener for receiving messages
 
       sock.on("message", (data) => {
-        console.log("Received message:", data);
-        ws.send(data);
+        // console.log("Received message:", data);        
+        // console.log("After received message",socket)
+        socket.emit("liveFeed",data)
       });
 
       // Event listener for connection close
@@ -82,9 +82,6 @@ socketIO.on("connection", (socket) => {
     } catch (e) {
       console.log(e);
     }
-    // ws.send("Received Credentials")
-
-    socket.emit("response", { message: "Data received" });
   });
   socket.on("disconnect", () => {
     console.log("User disconnected");
