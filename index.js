@@ -2,7 +2,12 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const ws = require('ws')
-const socketIO = require('socket.io');
+const socketIO = require("socket.io")(httpServer, {
+    cors: {
+      origin: "http://localhost:8080",
+      methods: ["GET", "POST"]
+    }
+  });
 const cors = require('cors')
 
 
@@ -14,7 +19,7 @@ app.use((_req, res, next) => {
   });
 let sock;
 
-const wss = new ws.Server({ server: server })
+// const wss = new ws.Server({ server: server })
 const io = socketIO(server);
 
 io.on('connection', (socket) => {
