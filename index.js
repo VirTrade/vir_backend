@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 app.use(cors());
 app.use((_req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -15,7 +16,6 @@ const socketIO = require("socket.io")(server, {
     methods: ["GET", "POST"],
   },
 });
-const cors = require("cors");
 
 let sock;
 
@@ -26,17 +26,17 @@ socketIO.on("connection", (socket) => {
   console.log("Socket connected");
   socket.on("sendData", (data) => {
     console.log("Received data from frontend:", data);
-    console.log(socket.handshake.headers);
-    console.log(data.payload);
+    console.log(socket.handshake.headers)
+    const headers = socket.handshake.headers
 
     // Create a WebSocket instance with the desired URL and headers
     try {
       sock = new WebSocket("ws://smartapisocket.angelone.in/smart-stream", {
         headers: {
-          Authorization: process.env.JWT_TOKEN,
-          "x-api-key": process.env.API_KEY,
-          "x-client-code": process.env.CLIENT_KEY,
-          "x-feed-token": process.env.feed - token,
+          "Authorization": headers.authorization,
+          "x-api-key": headers.apikey,
+          "x-client-code": headers.clientcode,
+          "x-feed-token": headers.feedtoken,
         },
       });
 
@@ -51,7 +51,7 @@ socketIO.on("connection", (socket) => {
             tokenList: [
               {
                 exchangeType: 5,
-                tokens: receivedData,
+                tokens: data,
               },
             ],
           },
