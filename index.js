@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const ws = require('ws')
-const socketIO = require("socket.io")(httpServer, {
+const socketIO = require("socket.io")(server, {
     cors: {
       origin: "http://localhost:8080",
       methods: ["GET", "POST"]
@@ -20,9 +20,9 @@ app.use((_req, res, next) => {
 let sock;
 
 // const wss = new ws.Server({ server: server })
-const io = socketIO(server);
+// const io = socketIO(server);
 
-io.on('connection', (socket) => {
+socketIO.on('connection', (socket) => {
     console.log('Socket connected');
     socket.on('sendData', (data) => {
         console.log('Received data from frontend:', data);
