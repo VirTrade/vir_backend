@@ -7,80 +7,82 @@ app.use((_req, res, next) => {
   res.header("Access-Control-Allow-Headers", "*");
   next();
 });
+let socketReadyPromise = null
 const WebSocket = require("ws");
 const server = require("http").createServer(app);
 const ws = require("ws");
+const e = require("express");
 const socketIO = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST","PUT","PATCH","DELETE"],
   },
 });
 
 let sock;
 
-// const wss = new ws.Server({ server: server })
-// const io = socketIO(server);
 let socketSet = new Set();
 let userSet = new Set();
 socketIO.on("connection", (socket) => {
   console.log("Socket connected with userSet", userSet);
-  let counter = 0; // Replace with your method to generate a unique ID
+  let counter = 0;
   let userId = counter + 1;
   userSet.add(userId);
   console.log(`User ${userId} connected`);
   socketSet.add(socket);
-
-  // Emit the user ID to the client
+  
   socket.emit('userId', userId);
-  socket.on("sendData", (data) => {
-    // console.log("Received data from frontend:", data);    
-    const headers = socket.handshake.headers
+  socket.on("sendData", async (data) => {
+    const headers = socket.handshake.headers    
+    if(!socketReadyPromise) {
+      socketReadyPromise = new Promise((resolve) => {
+        // try {
+          sock = new WebSocket("ws://smartapisocket.angelone.in/smart-stream", {
+            headers: {
+              "Authorization": headers.authorization,
+              "x-api-key": headers.apikey,
+              "x-client-code": headers.clientcode,
+              "x-feed-token": headers.feedtoken,
+            },
+          });
+    
+          sock.on("open", () => {        
+            resolve()
+            // sock.send(JSON.stringify(json_req));
+          });                        
+      })
+      await socketReadyPromise
 
-    // Create a WebSocket instance with the desired URL and headers
-    try {
-      sock = new WebSocket("ws://smartapisocket.angelone.in/smart-stream", {
-        headers: {
-          "Authorization": headers.authorization,
-          "x-api-key": headers.apikey,
-          "x-client-code": headers.clientcode,
-          "x-feed-token": headers.feedtoken,
+      let json_req = {
+        action: 0,
+        params: {
+          mode: 1,
+          tokenList: [
+            {
+              exchangeType: 5,
+              tokens: JSON.parse(data),
+            },
+          ],
         },
-      });
-
-      sock.on("open", () => {
-        // console.log("WebSocket connection established");
-
-        // Send a subscribe request for LTP mode with the desired token
-        let json_req = {
-          action: 1,
-          params: {
-            mode: 1,
-            tokenList: [
-              {
-                exchangeType: 5,
-                tokens: JSON.parse(data),
-              },
-            ],
-          },
-        };
-        sock.send(JSON.stringify(json_req));
-      });
-
-      // Event listener for receiving messages
+      };
+      sock.send(JSON.stringify(json_req));
 
       sock.on("message", (data) => {
-        // console.log("Received message:", data);        
-        // console.log("After received message",socket)
-        socket.emit("liveFeed",data)
+        console.log("Received message:", data);    
+          try {
+            console.log("userset",userSet)
+            socket.broadcast.emit("liveFeed",data)
+            console.log("userset",userSet)
+          }    
+          catch(e)  {
+            console.log("Exception e",e)
+          }        
       });
-
-      // Event listener for connection close
+      
       sock.on("close", (code, reason) => {
         console.log("WebSocket connection closed:", code, reason);        
       });
-
-      // Event listener for connection errors
+      
       sock.on("error", (error) => {
         console.error("WebSocket connection error:", error);
       });
@@ -88,8 +90,6 @@ socketIO.on("connection", (socket) => {
       setInterval(() => {
         socket.send("ping");
       }, 30000);
-    } catch (e) {
-    //   console.log(e);
     }
   });
   socket.on("disconnect", () => {
