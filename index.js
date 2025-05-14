@@ -12,7 +12,7 @@ const WebSocket = require("ws");
 const server = require("http").createServer(app);
 const socketIO = require("socket.io")(server, {
   cors: {
-    origin: "https://virtrade.netlify.app/",
+    origin: "https://virtrade.netlify.app",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   },
 });
