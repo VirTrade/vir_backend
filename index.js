@@ -2,17 +2,18 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 app.use(cors());
-app.use((_req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "*");
-  next();
-});
 let socketReadyPromise = null
 const WebSocket = require("ws");
 const server = require("http").createServer(app);
+app.use(cors({
+  origin: "https://virtrade.netlify.app", // ✅ precise origin, no trailing slash
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true,
+}));
+
 const socketIO = require("socket.io")(server, {
   cors: {
-    origin: "https://virtrade.netlify.app",
+    origin: "https://virtrade.netlify.app", // ✅ this is correct
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   },
 });
