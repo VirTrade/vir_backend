@@ -10,7 +10,13 @@ app.use(cors({
   credentials: true,
 }));
 
-const socketIO = require("socket.io")(server);
+const socketIO = require("socket.io")(server, {
+  cors: {
+    origin: "https://virtrade.netlify.app",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  },
+});
 
 const userSockets = {}; // key = userId/clientCode, value = socket
 
