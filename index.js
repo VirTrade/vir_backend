@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-app.use(cors());
 let socketReadyPromise = null
 const WebSocket = require("ws");
 const server = require("http").createServer(app);
@@ -11,14 +10,8 @@ app.use(cors({
   credentials: true,
 }));
 
-const socketIO = require("socket.io")(server, {
-  cors: {
-    origin: "https://virtrade.netlify.app", // ✅ this is correct
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  },
-});
+const socketIO = require("socket.io")(server);
 
-let sock;
 const userSockets = {}; // key = userId/clientCode, value = socket
 
 let socketSet = new Set();
