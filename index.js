@@ -4,19 +4,32 @@ const cors = require("cors");
 let socketReadyPromise = null
 const WebSocket = require("ws");
 const server = require("http").createServer(app);
+
+const allowedOrigins = [
+  "https://virtrade.netlify.app",
+];
+
 app.use(cors({
-  origin: "https://virtrade.netlify.app", // ✅ precise origin, no trailing slash
+  origin: function (origin, callback) {
+    console.log("Origin",origin)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true,
 }));
 
 const socketIO = require("socket.io")(server, {
   cors: {
-    origin: "https://virtrade.netlify.app",
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   },
 });
+
 
 const userSockets = {}; // key = userId/clientCode, value = socket
 
