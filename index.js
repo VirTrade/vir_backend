@@ -1,50 +1,47 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+let socketReadyPromise = null
 const WebSocket = require("ws");
 const server = require("http").createServer(app);
-
-// 🚨 Open CORS - use only for dev/testing
 app.use(cors({
-  origin: "*", // ✅ allow all origins
+  origin: "https://virtrade.netlify.app", // ✅ precise origin, no trailing slash
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  credentials: false, // ⚠️ Must be false if origin is "*"
+  credentials: true,
 }));
 
 const socketIO = require("socket.io")(server, {
   cors: {
-    origin: "*", // ✅ allow all origins
+    origin: "https://virtrade.netlify.app",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    credentials: false, // ⚠️ Must be false if origin is "*"
+    credentials: true,
   },
 });
 
 const userSockets = {}; // key = userId/clientCode, value = socket
+
 let socketSet = new Set();
 let userSet = new Set();
-
 socketIO.on("connection", (socket) => {
   console.log("Socket connected with userSet", userSet);
   let counter = 0;
   let userId = counter + 1;
-  userSet.add(userId);
+  userSet.add(userId);  
   socketSet.add(socket);
-
   const feedToken = socket.handshake.auth.feedToken;
   const apiKey = socket.handshake.auth.apiKey;
   const clientCode = socket.handshake.auth.clientCode;
-
   console.log("Feed token:", feedToken);
   console.log("Jwt token:", apiKey);
   console.log("Refresh token:", clientCode);
 
-  socket.emit("userId", userId);
+  socket.emit('userId', userId);
+  socket.on("sendData",(data) => {
+    console.log("data", data)
+    
+    handleUserConnection(clientCode,apiKey,feedToken,data,socket)
 
-  socket.on("sendData", (data) => {
-    console.log("data", data);
-    handleUserConnection(clientCode, apiKey, feedToken, data, socket);
   });
-
   socket.on("disconnect", () => {
     console.log(`User ${userId} disconnected`);
     socketSet.delete(socket);
@@ -54,16 +51,16 @@ socketIO.on("connection", (socket) => {
 
 app.get("/stocks", async (req, res) => {
   try {
-    const response = await fetch("https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json");
-    const data = await response.json();
-    res.json(data);
+      const response = await fetch("https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json");
+      const data = await response.json();
+      res.json(data);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch data" });
+      res.status(500).json({ error: "Failed to fetch data" });
   }
 });
 
 function handleUserConnection(clientCode, apiKey, feedToken, data, socket) {
-  console.log("Data received", data);
+  console.log("Data received",data)
   if (userSockets[clientCode] && userSockets[clientCode].readyState === WebSocket.OPEN) {
     console.log("Reusing existing socket for", clientCode);
     subscribeToTokens(userSockets[clientCode], data);
@@ -119,7 +116,7 @@ function subscribeToTokens(sock, data) {
       ],
     },
   };
-  console.log("json_req", json_req);
+  console.log("json_req",json_req)
   sock.send(JSON.stringify(json_req));
 }
 
